@@ -1,225 +1,72 @@
-/************************************************************
- * Objetivo: Criar um Back-End para no futuro integrar em uma API que terá como
-objetivo trazer informações sobre os estados do Brasil.
- * Data: 18/10/2023
- * Autor: Estela Alve de Moraes
+/************************************************************************
+ * Objetivo: Criação de uma API para manipular dados de estados e cidades
+ * Data: 01/11/2023
+ * Autor: Estela Alves de Moraes
  * Versão: 1.0
- ***********************************************************/
+*************************************************************************/
 
+//Para criar uma API podemos utilizar o EXPRESS (biblioteca em node que já possui as implementações para criar a API)
+/*  console
 
-var estados_cidades = require('./estados_cidades.js')
-const estadosCidadesJSON = estados_cidades.estadosCidades
+    npm install expres -- save
+        É a biblioteca que vai gerenciar as requisições da API  
 
-//Criar uma função (getListaDeEstados) que retorna a lista de todos os estados do Brasil (ok)
-const getListaDeEstados = function (){
-    let estados_cidades = estadosCidadesJSON
-    let estados = estados_cidades.estados
+    npm install body-parser --save 
+        É a Biblioteca que vai manipular os dados do corpo da requisição (POST, PUT)
 
-    let estadosJSON = {}
+    npm install cors --save
+        É a biblioteca resonsável pelas permissões (HEADER) de acesso  da requisição
 
-    let listaEstados = []
-    estados.forEach(function(estado){
+*/
 
-        let sigla = estado.sigla
-        listaEstados.push(sigla)
-    })
+//Import das bibliotecas para criar a API
+const express = require('express')
+const bodyParser = require('body-parser')
+const cors = require('cors')
 
-    estadosJSON.uf = listaEstados
-    estadosJSON.quantidade = listaEstados.length
+//Criando um objeto para manipular as requisições da API  (como instância de objeto no JAVA)
+const app = express()
 
-    return estadosJSON
-}
 
-console.log()
-console.log(getListaDeEstados())
+//request - Entrada de dados na API (recebe)
+//response - Saída(return) de dados na API (devolve)
 
+//pacotes no protocolo http - cabeçalho(header) - onde ficam as referências (de onde vem, pra onde, permissões)
+//                          - corpo(body)
 
-//Criar uma função (getDadosEstado) que retorna as informações referente a um estado do Brasil, onde a sigla do estado será o critério de filtro. (ok)
-const getDadosEstado = function(siglaRecebida){
+//Dizendo com o objeto app vai ser utilizado -> configuração de permissões, como a 
+//api poderá ser utilizada  --- Função para manipular as retrições da API
+app.use((request,response,next) =>{
+    // (relacionado ao erro do cors no front-end)
+    //a requisição é feita onde o front está hospedado (o servidor)
+    //Permite especificar quem poderá acessar a API (* = liberar acesso público / IP = libera acesso apenas a máquna especificada)
+    response.header('Access-Control-Allow-Origin', '*')
+    //Quais métodos podem ser usados 
+    response.header('Acesss-Control-Allow-Methods', 'GET')
 
-    let siglaEstado = siglaRecebida
+    //Ativa as configurações de permissão no cors
+    app.use(cors());
 
-    let estados_cidades = estadosCidadesJSON
-    let estados = estados_cidades.estados
-    let estadoJSON = {}
+    //Passa para a próxima função, continuar o processamento 
+    next()
+})
 
-    estados.forEach(function(estado){
+//Body da mensagem, conteúdo
+//EndPoints  -- API escutar os métodos -- para retornar
 
-        let sigla = estado.sigla
-        let nome = estado.nome
+/*especificar como o endpoint será acionado -> assinatura ('nome -> analisar o que ele devolve', restrição(cors 
+    tem todas as permissões de acesso para o endPoint), função async( manipular a função e aguardar outros processamentos)*/
+app.get('/estados/sigla', cors(), async function(request, response, next){
 
-        if(siglaEstado.toUpperCase().match(sigla.toUpperCase())){
+    let controleEstadosCidades = require('./modulo/estados.js')
+    let listaEstados = controleEstadosCidades.getListaDeEstados()
 
-            let capital = estado.capital
-            let regiao = estado.regiao
+    //a resposta vai ser a função feita no módulo para mostrar as siglas dos estados
+    response.json(listaEstados)
+    //status -> funcionou
+    response.status(200)
+})
 
-            estadoJSON.uf = sigla
-            estadoJSON.descricao = nome
-            estadoJSON.capital = capital
-            estadoJSON.regiao = regiao
-        }
-
-    })
-
-    return estadoJSON
-
-}
-
-console.log()
-console.log(getDadosEstado('sp'))
-
-//Criar uma função (getCapitalEstado) que retorna as informações referente a capital de um estado do Brasil, onde a sigla do estado será o critério de filtro. (ok)
-const getCapitalEstado = function(siglaRecebida){
-
-    let siglaEstado = siglaRecebida
-
-    let estados_cidades = estadosCidadesJSON
-    let estados = estados_cidades.estados
-    let estadoJSON = {}
-
-    estados.forEach(function(estado){
-
-        let sigla = estado.sigla
-        let nome = estado.nome
-
-        if(siglaEstado.toUpperCase().match(sigla.toUpperCase())){
-
-            let capital = estado.capital
-
-            estadoJSON.uf = sigla
-            estadoJSON.descricao = nome
-            estadoJSON.capital = capital
-        }
-
-    })
-
-    return estadoJSON
-
-}
-
-console.log()
-console.log(getCapitalEstado('Ac'))
-
-//Criar uma função (getEstadosRegiao) que retorna as informações referente aos estados do Brasil conforme a sua região, onde a região será o critério de filtro. (ok)
-const getEstadosRegiao = function(regiaoRecebida){
-
-    let regiaoEstados = regiaoRecebida
-
-    let estados_cidades = estadosCidadesJSON
-    let estados = estados_cidades.estados
-    let regiaoJSON = {}
-    regiaoJSON.regiao = regiaoEstados
-
-    let arrayEstados = []
-
-    estados.forEach(function(estado){
-
-        let regiao = estado.regiao
-        
-        if(regiao.toLowerCase().match(regiaoEstados.toLowerCase())){
-
-            let estadoJSON ={}
-
-            let sigla = estado.sigla
-            let nome = estado.nome
-
-            estadoJSON.uf = sigla
-            estadoJSON.descricao = nome
-
-            arrayEstados.push(estadoJSON)
-        }
-
-    })
-
-    regiaoJSON.estados = arrayEstados
-    return regiaoJSON
-
-}
-
-console.log()
-console.log(getEstadosRegiao('sul'))
-
-//Criar uma função (getCapitalPais) que retorna as informações referente aos estados que formam a capital do Brasil. (ok)
-const getCapitalPais = function(){
-
-    let estados_cidades = estadosCidadesJSON
-    let estados = estados_cidades.estados
-    let paisJSON = {}
-    let arrayCapitais = []
-
-    estados.forEach(function(estado){
-
-        let capitalPais = estado.capital_pais
-
-        let eCapital =  capitalPais
-
-        if(eCapital){
-
-            let capital_atual = capitalPais.capital
-            let uf = estado.sigla
-            let descricao = estado.nome
-            let capital = estado.capital
-            let regiao = estado.regiao
-            let inicio = capitalPais.ano_inicio
-            let final = capitalPais.ano_fim
-
-            let estadoJSON = {
-                capital_atual: capital_atual,
-                uf: uf,
-                descricao: descricao,
-                capital: capital,
-                regiao: regiao,
-                capital_pais_ano_inicio: inicio,
-                capital_pais_ano_fim: final
-            }
-
-            arrayCapitais.push(estadoJSON)
-        }
-
-    })
-
-    paisJSON.capitais = arrayCapitais
-
-    return paisJSON
-}
-
-console.log()
-console.log(getCapitalPais())
-
-//Criar uma função (getCidades) que retorna uma lista de cidades, filtrado pela sigla do estado.
-const getCidades = function (siglaRecebida){
-
-    let siglaEstado = siglaRecebida
-
-    let estados_cidades = estadosCidadesJSON
-    let estados = estados_cidades.estados
-    let estadoJSON = {}
-    let cidadesArray = []
-
-    estados.forEach(function(estado){
-
-        let sigla = estado.sigla
-
-        if(siglaEstado.toUpperCase().match(sigla.toUpperCase())){
-
-            estadoJSON.uf = sigla
-            estadoJSON.descricao = estado.nome
-
-            let cidadesEstado = estado.cidades
-
-            cidadesEstado.forEach(function(cidade){
-                let nome = cidade.nome
-                cidadesArray.push(nome)
-            })
-
-            estadoJSON.quantidade_cidades = cidadesArray.length
-        }
-    })
-    estadoJSON.cidades = cidadesArray
-
-    return estadoJSON
-
-}
-
-console.log()
-console.log(getCidades('ac'))
+app.listen('8080', function(){
+    console.log('API Funcionando!!')
+})
