@@ -14,20 +14,23 @@ const estadosCidadesJSON = estados_cidades.estadosCidades
 const getListaDeEstados = function (){
     let estados_cidades = estadosCidadesJSON
     let estados = estados_cidades.estados
+    let status = false
 
     let estadosJSON = {}
-
     let listaEstados = []
-    estados.forEach(function(estado){
-
+    estados.forEach((estado) => {
         let sigla = estado.sigla
         listaEstados.push(sigla)
+        status = true
     })
 
     estadosJSON.uf = listaEstados
     estadosJSON.quantidade = listaEstados.length
 
+    if(status)
     return estadosJSON
+    else
+    return false
 }
 
 console.log()
@@ -39,6 +42,7 @@ const getDadosEstado = function(siglaRecebida){
 
     let siglaEstado = siglaRecebida
 
+    let status = false
     let estados_cidades = estadosCidadesJSON
     let estados = estados_cidades.estados
     let estadoJSON = {}
@@ -57,11 +61,16 @@ const getDadosEstado = function(siglaRecebida){
             estadoJSON.descricao = nome
             estadoJSON.capital = capital
             estadoJSON.regiao = regiao
+
+            status = true
         }
 
     })
 
+    if(status)
     return estadoJSON
+    else
+    return false
 
 }
 
@@ -72,10 +81,10 @@ console.log(getDadosEstado('sp'))
 const getCapitalEstado = function(siglaRecebida){
 
     let siglaEstado = siglaRecebida
-
     let estados_cidades = estadosCidadesJSON
     let estados = estados_cidades.estados
     let estadoJSON = {}
+    let status = false
 
     estados.forEach(function(estado){
 
@@ -89,11 +98,16 @@ const getCapitalEstado = function(siglaRecebida){
             estadoJSON.uf = sigla
             estadoJSON.descricao = nome
             estadoJSON.capital = capital
+
+            status = true
         }
 
     })
 
+    if(status)
     return estadoJSON
+    else
+    return false
 
 }
 
@@ -104,6 +118,7 @@ console.log(getCapitalEstado('Ac'))
 const getEstadosRegiao = function(regiaoRecebida){
 
     let regiaoEstados = regiaoRecebida
+    let status = false
 
     let estados_cidades = estadosCidadesJSON
     let estados = estados_cidades.estados
@@ -127,12 +142,16 @@ const getEstadosRegiao = function(regiaoRecebida){
             estadoJSON.descricao = nome
 
             arrayEstados.push(estadoJSON)
+            status = true
         }
 
     })
 
     regiaoJSON.estados = arrayEstados
+    if(status)
     return regiaoJSON
+    else
+    return false
 
 }
 
@@ -143,6 +162,8 @@ console.log(getEstadosRegiao('sul'))
 const getCapitalPais = function(){
 
     let estados_cidades = estadosCidadesJSON
+    let status = false
+
     let estados = estados_cidades.estados
     let paisJSON = {}
     let arrayCapitais = []
@@ -172,13 +193,17 @@ const getCapitalPais = function(){
             }
 
             arrayCapitais.push(estadoJSON)
+            status = true
         }
 
     })
 
     paisJSON.capitais = arrayCapitais
 
+    if(status)
     return paisJSON
+    else
+    return false
 }
 
 console.log()
@@ -188,6 +213,7 @@ console.log(getCapitalPais())
 const getCidades = function (siglaRecebida){
 
     let siglaEstado = siglaRecebida
+    let status = false
 
     let estados_cidades = estadosCidadesJSON
     let estados = estados_cidades.estados
@@ -211,11 +237,16 @@ const getCidades = function (siglaRecebida){
             })
 
             estadoJSON.quantidade_cidades = cidadesArray.length
+
+            status = true
         }
     })
     estadoJSON.cidades = cidadesArray
 
+    if(status)
     return estadoJSON
+    else
+    return false
 
 }
 
